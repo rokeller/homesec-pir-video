@@ -110,9 +110,14 @@ func (pin *Pin) Close() {
 }
 
 func startRecording() *exec.Cmd {
-	path := fmt.Sprintf("/data/video/%s.h264", time.Now().Format("20060102_150405"))
+	timestamp := time.Now()
+	baseName := fmt.Sprintf("/data/video/%s", timestamp.Format("20060102_150405"))
+	path := baseName + ".h264"
 	cmd := exec.Command("raspivid", "-t", "0", "-o", path, "-w", "720", "-h", "480", "-fps", "25", "-b", "250000")
 	cmd.Start()
+
+	srt := fmt.Sprintf("1\n00:00:00,000 --> 00:01:00,000\n%s\n", timestamp.Format("2006-01-02 15:04:05"))
+	ioutil.WriteFile(baseName+".srt", []byte(srt), 0644)
 
 	return cmd
 }
